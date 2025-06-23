@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Medicine AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        form {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Personalized Medicine AI</h1>
+    <form id="geneticForm">
+        <label for="disease">Disease:</label>
+        <select id="disease" name="disease" required>
+            <option value="Diabetes">Diabetes</option>
+            <option value="Hypertension">Hypertension</option>
+            <option value="Hypercholesterolemia">Hypercholesterolemia</option>
+            <option value="Asthma">Asthma</option>
+            <option value="Obesity">Obesity</option>
+        </select>
+
+        <label for="gene1">Gene 1:</label>
+        <select id="gene1" name="gene1" required>
+            <option value="AA">AA</option>
+            <option value="AT">AT</option>
+            <option value="TT">TT</option>
+        </select>
+
+        <label for="gene2">Gene 2:</label>
+        <select id="gene2" name="gene2" required>
+            <option value="CC">CC</option>
+            <option value="CG">CG</option>
+            <option value="GG">GG</option>
+        </select>
+
+        <label for="gene3">Gene 3:</label>
+        <select id="gene3" name="gene3" required>
+            <option value="AA">AA</option>
+            <option value="AG">AG</option>
+            <option value="GG">GG</option>
+        </select>
+
+        <button type="submit">Get Treatment Recommendation</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('geneticForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                disease: document.getElementById('disease').value,
+                gene_1: document.getElementById('gene1').value,
+                gene_2: document.getElementById('gene2').value,
+                gene_3: document.getElementById('gene3').value
+            };
+
+            fetch('/recommend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerHTML = `
+                    <h2>Recommendation for ${data.disease}</h2>
+                    <p><strong>Risk Level:</strong> ${data.risk_level}</p>
+                    <p><strong>Treatment Plan:</strong> ${data.treatment_plan}</p>
+                `;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('result').textContent = 'An error occurred while getting the recommendation.';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+from flask import Flask, request, render_template, jsonify
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+import joblib
+
+# Initialize the Flask app
+app = Flask(_name_)
+
+# Load dataset
+data = pd.read_csv('Desktop')  # Ensure this matches your dataset structure
+
+# Preprocess the data (customize based on your data structure)
+X = data.drop(columns=['Outcome'])  # Replace 'Outcome' with the column for predictions
+y = data['Outcome']  # Replace 'Outcome' with your target column
+
+# Train the Decision Tree model
+model = DecisionTreeClassifier()
+model.fit(X, y)
+
+# Save the model for later use (optional)
+joblib.dump(model, 'decision_tree_model.pkl')
+
+@app.route('/')
+def home():
+    return render_template('index.html')  # Create an HTML file for user input
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    # Get user input from the form
+    input_data = [float(request.form.get(f'feature_{i}')) for i in range(X.shape[1])]
+
+    # Load the trained model (optional if loading from disk)
+    model = joblib.load('decision_tree_model.pkl')
+
+    # Predict the outcome
+    prediction = model.predict([input_data])
+
+    # Create a recommendation based on the prediction
+    if prediction[0] == 1:  # Example condition based on predicted output
+        recommendation = "Recommended Treatment A"
+    else:
+        recommendation = "Recommended Treatment B"
+
+    return jsonify({'prediction': prediction[0], 'recommendation': recommendation})
+
+if _name_ == '_main_':
+    app.run(debug=True)
